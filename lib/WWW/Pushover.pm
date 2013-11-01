@@ -161,11 +161,13 @@ sub notify {
 1;
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
 
-WWW::Pushover - It's new $module
+WWW::Pushover - A lightweight Pushover API warpper.
 
 =head1 SYNOPSIS
 
