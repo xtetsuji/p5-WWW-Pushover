@@ -1,6 +1,6 @@
 # NAME
 
-WWW::Pushover - It's new $module
+WWW::Pushover - A lightweight Pushover API warpper.
 
 # SYNOPSIS
 
@@ -8,7 +8,18 @@ WWW::Pushover - It's new $module
 
 # DESCRIPTION
 
-WWW::Pushover is ...
+WWW::Pushover is [Pushover](http://www.pushover.net/) interface.
+
+# METHODS
+
+(stub)
+
+# MOTIVATION
+
+As perl pushover API, [Webservice::Pushover](http://search.cpan.org/perldoc?Webservice::Pushover) is exist.
+But it is too heavy, e.g. dependecy of [Moose](http://search.cpan.org/perldoc?Moose), and so on.
+
+[WWW::Pushover](http://search.cpan.org/perldoc?WWW::Pushover) concept is light interface and only core module implementation.
 
 # LICENSE
 
