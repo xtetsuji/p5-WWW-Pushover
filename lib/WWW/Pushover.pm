@@ -18,6 +18,8 @@ use JSON::PP;
 use constant ENDPOINT_URL   => 'https://api.pushover.net';
 use constant HTTP_TIMEOUT   => 10;
 
+use constant DEBUG => $ENV{DEBUG};
+
 our $VERSION = "0.01";
 our $UA_NAME = "Perl/WWW::Pushover/$VERSION";
 
@@ -169,8 +171,10 @@ sub notify {
         # Is message internal UTF-8 string?
         $option{message} = encode('utf-8', $option{message});
     }
-    use Data::Dumper;
-    print Dumper(\%option);
+    if ( DEBUG ) {
+        require Data::Dumper;
+        print Data::Dumper::Dumper(\%option);
+    }
     $self->_http_post(
         ENDPOINT_URL . '/1/messages.json',
         \%option
