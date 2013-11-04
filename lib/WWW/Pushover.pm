@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
+use Encode;
 
 use constant HAVE_HTTP_TINY => eval {
     require HTTP::Tiny; 1;
@@ -27,8 +28,8 @@ sub new {
     my %arg   = @_;
     my $self  = {};
     ### required parameters
-    $self->{token} = $arg{token} or croak "token parameter is required";
-    $self->{user}  = $arg{user}  or croak "user parameter is required";
+    $self->{token} = delete $arg{token} or croak "token parameter is required";
+    $self->{user}  = delete $arg{user}  or croak "user parameter is required";
     ### optional parameters
     for my $key (@OPTIONS) {
         $self->{$key} = $arg{$key} if exists $arg{$key};
@@ -117,6 +118,9 @@ sub _http_post {
     my $self = shift;
     my $url = shift;
     my $form_data = shift;
+    if ( !ref $form_data || ref $form_data ne 'HASH' ) {
+        croak "form_data is required as HASH reference.";
+    }
     my $ua = $self->_ua();
     # key: url, reason(OK/NG), success(0/1), status, content, headers(response headers hash refrence lower), protocol
     if ( $ua->isa('HTTP::Tiny') ) {
@@ -145,16 +149,31 @@ sub notify {
     my $self = shift;
     my %arg  = @_;
     my %option;
-    for my $option_key (@OPTIONS) {
+    for my $option_key (@OPTIONS, qw/token user message/) {
         if ( exists $arg{$option_key} ) {
+            # specify key is high priority.
             $option{$option_key} = $arg{$option_key};
         }
         elsif ( exists $self->{$option_key} ) {
+            # method memory key is low priority.
             $option{$option_key} = $self->{$option_key};
         }
     }
-    $self->_ua->_http_post(
-        ENDPOINT_URL . '/1/messages.json', \%option
+    if ( !$option{token} || !$option{user} ) {
+        croak "token and user are required.";
+    }
+    if ( !$option{message} ) {
+        croak "message key is required.";
+    }
+    else {
+        # Is message internal UTF-8 string?
+        $option{message} = encode('utf-8', $option{message});
+    }
+    use Data::Dumper;
+    print Dumper(\%option);
+    $self->_http_post(
+        ENDPOINT_URL . '/1/messages.json',
+        \%option
     );
 }
 
@@ -182,6 +201,7 @@ WWW::Pushover is L<Pushover|http://www.pushover.net/> interface.
 =head2 WWW::Pushover->new( token => TOKEN, user => USER, ... )
 
     my $pushover = WWW::Pushover->new( token => TOKEN, user => USER );
+    $pushover->notify();
 
 Constructor. It gives some key/value pair parameters.
 B<token and user keys are required>.
@@ -202,7 +222,37 @@ Output sound data that this module has information.
 
 This option likes Encode->encodinds(":all") on L<Encode> module.
 
+=head2 device
 
+=head2 title
+
+=head2 url
+
+=head2 url_title
+
+=head2 priority
+
+=head2 timestamp
+
+=head2 sound
+
+=head2 _json_parser
+
+Internal method.
+
+=head2 _ua
+
+Internal method.
+
+=head2 _http_post
+
+Internal method.
+
+=head2 notify
+
+Execution notify operation.
+
+    $pushover->notify( message => "some message" );
 
 =head1 MOTIVATION
 
