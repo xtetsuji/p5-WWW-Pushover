@@ -20,7 +20,7 @@ use constant HTTP_TIMEOUT   => 10;
 our $VERSION = "0.01";
 our $UA_NAME = "Perl/WWW::Pushover/$VERSION";
 
-my @OPTINOS = (qw/device title url url_title priority timestamp sound/);
+my @OPTIONS = (qw/device title url url_title priority timestamp sound/);
 
 sub new {
     my $class = shift;
@@ -179,11 +179,34 @@ WWW::Pushover is L<Pushover|http://www.pushover.net/> interface.
 
 =head1 METHODS
 
-(stub)
+=head2 WWW::Pushover->new( token => TOKEN, user => USER, ... )
+
+    my $pushover = WWW::Pushover->new( token => TOKEN, user => USER );
+
+Constructor. It gives some key/value pair parameters.
+B<token and user keys are required>.
+
+Other keys, this keys are defined in source code.
+
+    my @OPTINOS = (qw/device title url url_title priority timestamp sound/);
+
+See following methods for detail.
+
+=head2 sounds
+
+    # In list context.
+    my @sounds_detail = WWW::Pushover->sounds(); # output detail
+    my @sounds        = WWW::Pushover->sounds(":all"); # sounds name only
+
+Output sound data that this module has information.
+
+This option likes Encode->encodinds(":all") on L<Encode> module.
+
+
 
 =head1 MOTIVATION
 
-As perl pushover API, L<Webservice::Pushover> is exist.
+As perl pushover API, L<WebService::Pushover> is exist.
 But it is too heavy, e.g. dependecy of L<Moose>, and so on.
 
 L<WWW::Pushover> concept is light interface and only core module implementation.
