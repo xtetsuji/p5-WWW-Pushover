@@ -36,6 +36,9 @@ sub new {
     for my $key (@OPTIONS) {
         $self->{$key} = $arg{$key} if exists $arg{$key};
     }
+    ### User-Agent change.
+    $self->{agent} = $arg{agent} if exists $arg{agent};
+
     return bless $self, $class;
 }
 
@@ -100,13 +103,13 @@ sub _ua {
     my $self = shift;
     if ( HAVE_HTTP_TINY ) {
         $self->{ua} ||= HTTP::Tiny->new(
-            agent => $UA_NAME,
+            agent => $self->{agent} || $UA_NAME,
             timeout => HTTP_TIMEOUT,
         );
     }
     elsif ( HAVE_LWP_UA ) {
         $self->{ua} ||= LWP::UserAgent->new(
-            agent => $UA_NAME,
+            agent => $self->{agent} || $UA_NAME,
             timeout => HTTP_TIMEOUT,
         );
     }
@@ -263,7 +266,8 @@ Execution notify operation.
 As perl pushover API, L<WebService::Pushover> is exist.
 But it is too heavy, e.g. dependecy of L<Moose>, and so on.
 
-L<WWW::Pushover> concept is light interface and only core module implementation.
+L<WWW::Pushover> concept is light interface and only core module implementation
+over Perl5.14 or it's later.
 
 =head1 LICENSE
 
