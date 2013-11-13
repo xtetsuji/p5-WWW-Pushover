@@ -23,7 +23,15 @@ use constant DEBUG => $ENV{DEBUG};
 our $VERSION = "0.01";
 our $UA_NAME = "Perl/WWW::Pushover/$VERSION";
 
-my @OPTIONS = (qw/device title url url_title priority timestamp sound/);
+my @OPTIONS = (qw/
+  device
+  title
+  url
+  url_title
+  priority
+  timestamp
+  sound
+/);
 
 sub new {
     my $class = shift;
@@ -52,42 +60,19 @@ for my $method (@OPTIONS) {
     }
 }
 
-# print WWW::Pushover->all_sounds();
+# print $pushover->all_sounds();
 # like Encode->encodings(":all")
 sub sounds {
-    my $class = shift;
+    my $self = shift;
     my $type = shift;
-
-    my $data = <<END_DATA;
-    pushover - Pushover (default)
-    bike - Bike
-    bugle - Bugle
-    cashregister - Cash Register
-    classical - Classical
-    cosmic - Cosmic
-    falling - Falling
-    gamelan - Gamelan
-    incoming - Incoming
-    intermission - Intermission
-    magic - Magic
-    mechanical - Mechanical
-    pianobar - Piano Bar
-    siren - Siren
-    spacealarm - Space Alarm
-    tugboat - Tug Boat
-    alien - Alien Alarm (long)
-    climb - Climb (long)
-    persistent - Persistent (long)
-    echo - Pushover Echo (long)
-    updown - Up Down (long)
-    none - None (silent)
-END_DATA
-
-    if ( !$type || $type eq ':line' ) {
-        return wantarray ? $data =~ /^\s*([^\n]+)$/mg : $data;
+    my $res = $self->_http_get( ENDPOINT_URL . '/1/sounds.json?token=' . $self->{token} );
+    if ( $res->{is_success} ) {
+        my $data = $self->_json_parser($res->{content});
+        my @sounds = sort keys %{$data->{sounds}};
+        return wantarray ? @sounds : \@sounds;
     }
-    elsif ( $type eq ':name' || $type eq ':all' ) {
-        return wantarray ? $data =~ /^\s*(\S+)/mg : $data;
+    else {
+        die "Sounds API is failed.";
     }
 }
 
@@ -134,6 +119,31 @@ sub _http_post {
     }
     elsif ( $ua->isa('LWP::UserAgent') ) {
         my $res = $ua->post($url, $form_data);
+        my $response = {
+            url => $url,
+            reason => $res->is_success ? 'OK' : 'NG',
+            success => $res->is_success ? 1 : 0,
+            content => $res->content,
+            headers => $res->headers(), # loose
+            protocol => $res->protocol(),
+        };
+        return $response;
+    }
+    else {
+        die "Browser is not found.";
+    }
+}
+
+sub _http_get {
+    my $self = shift;
+    my $url = shift;
+    my $ua = $self->_ua();
+    if ( $ua->isa('HTTP::Tiny') ) {
+        my $response = $ua->get($url);
+        return $response;
+    }
+    elsif ( $ua->isa('LWP::UserAgent') ) {
+        my $res = $ua->get($url);
         my $response = {
             url => $url,
             reason => $res->is_success ? 'OK' : 'NG',
@@ -222,12 +232,9 @@ See following methods for detail.
 =head2 sounds
 
     # In list context.
-    my @sounds_detail = WWW::Pushover->sounds(); # output detail
-    my @sounds        = WWW::Pushover->sounds(":all"); # sounds name only
+    my @sounds_detail = $pushover->sounds(); # output detail
 
-Output sound data that this module has information.
-
-This option likes Encode->encodinds(":all") on L<Encode> module.
+Output sound data. There are feteched from API server.
 
 =head2 device
 
