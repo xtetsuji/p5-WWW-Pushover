@@ -33,6 +33,9 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Data::Dumper" : "0"
+         },
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion" : "0.10108",
