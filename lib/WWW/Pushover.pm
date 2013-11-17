@@ -42,10 +42,10 @@ sub new {
     $self->{user}  = delete $arg{user}  or croak "user parameter is required";
     ### optional parameters
     for my $key (@OPTIONS) {
-        $self->{$key} = $arg{$key} if exists $arg{$key};
+        $self->{$key} = delete $arg{$key} if exists $arg{$key};
     }
     ### User-Agent change.
-    $self->{agent} = $arg{agent} if exists $arg{agent};
+    $self->{agent} = delete $arg{agent} if exists $arg{agent};
 
     return bless $self, $class;
 }

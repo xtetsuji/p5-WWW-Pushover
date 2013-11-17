@@ -29,12 +29,9 @@ See following methods for detail.
 ## sounds
 
     # In list context.
-    my @sounds_detail = WWW::Pushover->sounds(); # output detail
-    my @sounds        = WWW::Pushover->sounds(":all"); # sounds name only
+    my @sounds_detail = $pushover->sounds(); # output detail
 
-Output sound data that this module has information.
-
-This option likes Encode->encodinds(":all") on [Encode](http://search.cpan.org/perldoc?Encode) module.
+Output sound data. There are feteched from API server.
 
 ## device
 
