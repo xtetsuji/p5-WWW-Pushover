@@ -57,7 +57,7 @@ for my $method (@OPTIONS) {
         my $self = shift;
         return $self->{$method} if @_ == 1;
         return $self->{$method} = shift;
-    }
+    };
 }
 
 # print $pushover->all_sounds();
@@ -66,8 +66,8 @@ sub sounds {
     my $self = shift;
     my $type = shift;
     my $res = $self->_http_get( ENDPOINT_URL . '/1/sounds.json?token=' . $self->{token} );
-    if ( $res->{is_success} ) {
-        my $data = $self->_json_parser($res->{content});
+    if ( $res->{success} ) {
+        my $data = $self->_json_parser->decode($res->{content});
         my @sounds = sort keys %{$data->{sounds}};
         return wantarray ? @sounds : \@sounds;
     }
@@ -181,8 +181,8 @@ sub notify {
         croak "message key is required.";
     }
     else {
-        # Is message internal UTF-8 string?
-        $option{message} = encode('utf-8', $option{message});
+        # TODO: Is message internal UTF-8 string?
+#        $option{message} = encode('utf-8', $option{message});
     }
     if ( DEBUG ) {
         require Data::Dumper;
@@ -218,7 +218,9 @@ WWW::Pushover is L<Pushover|http://www.pushover.net/> interface.
 =head2 WWW::Pushover->new( token => TOKEN, user => USER, ... )
 
     my $pushover = WWW::Pushover->new( token => TOKEN, user => USER );
-    $pushover->notify();
+    $pushover->notify(
+        message => $message,
+    );
 
 Constructor. It gives some key/value pair parameters.
 B<token and user keys are required>.
