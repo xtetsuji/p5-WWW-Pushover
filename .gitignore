@@ -26,3 +26,4 @@ MYMETA.*
 /WWW-Pushover-*
 
 local/
+.DS_Store
