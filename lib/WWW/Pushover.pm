@@ -2,6 +2,7 @@ package WWW::Pushover;
 use 5.008005;
 use strict;
 use warnings;
+use utf8;
 
 use Carp qw(croak);
 use Encode;
@@ -183,6 +184,10 @@ sub notify {
     else {
         # TODO: Is message flagged UTF-8 string?
 #        $option{message} = encode('utf-8', $option{message});
+        if ( utf8::is_utf8($option{message}) {
+            # upgrade for JSON::PP (TODO: confirmation whether this is correct)
+            $option{message} = utf8::upgrade($option{message});
+        }
     }
     if ( DEBUG ) {
         require Data::Dumper;
@@ -333,6 +338,8 @@ If you want to send non-ASCII multibyte character,
 you must construct message as UTF-8.
 
 And this message's UTF-8 string is B<required as flagged (Perl internal) string> on current version's WWW::Pushover (VERSION=0.01).
+
+Support that message is both flagged and unflagged UTF-8 string (VERSION=0.02).
 
 =head1 MOTIVATION
 
